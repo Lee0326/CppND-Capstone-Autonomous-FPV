@@ -249,7 +249,7 @@ int main(int argc, char **argv)
 
   // command.force[0] = 0;
   // command.force[1] = 0;
-  // command.force[2] = quad.getMass() * quad.getGravity() + 0.01;
+  // command.force[2] = quad.getMass() * quad.getGravity() + 0.05;
   // command.qx = 0;
   // command.qy = 0;
   // command.qz = 0;

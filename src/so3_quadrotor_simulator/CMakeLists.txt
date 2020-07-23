@@ -34,7 +34,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(quadrotor_dynamics src/dynamics/Quadrotor.cpp)
+add_library(quadrotor_dynamics src/Quadrotor.cpp)
 
 ## Declare a cpp executable
 #add_executable(odom_visualization src/odom_visualization.cpp)
