@@ -17,7 +17,6 @@ int main(int argc, char **argv)
     auto trigger_time = ros::Time::now();
     visualization_msgs::Marker gateROS;
     gateROS.header.frame_id = "world";
-    gateROS.header.stamp = ros::Time();
     gateROS.ns = "gate";
     gateROS.id = 0;
     gateROS.type = visualization_msgs::Marker::MESH_RESOURCE;
@@ -27,7 +26,7 @@ int main(int argc, char **argv)
     while (ros::ok())
     {
         double duration = (ros::Time::now() - trigger_time).toSec();
-
+        gateROS.header.stamp = ros::Time();
         //set the pose of the gate
         gateROS.pose.position.x = 5 + 0.5 * sin(duration);
         gateROS.pose.position.y = 5 + 0.5 * sin(duration);
