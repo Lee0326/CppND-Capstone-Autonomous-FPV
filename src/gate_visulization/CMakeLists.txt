@@ -15,9 +15,8 @@ generate_messages()
 
 catkin_package()
 
-#find_package(Armadillo REQUIRED)
-#include_directories(${ARMADILLO_INCLUDE_DIRS})
-
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN_INCLUDE_DIR})
 
 include_directories(include)
 include_directories(
