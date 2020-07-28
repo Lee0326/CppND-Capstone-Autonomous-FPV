@@ -23,7 +23,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(gate_visualization src/gate_visulization_node.cpp)
+add_executable(gate_visualization 
+src/gate.cpp
+src/gate_visulization_node.cpp)
 
 target_link_libraries(gate_visualization
    ${catkin_LIBRARIES}
