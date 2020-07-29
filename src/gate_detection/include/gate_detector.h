@@ -11,10 +11,11 @@
 #include "pose_utils.h"
 #include <future>
 #include <memory>
+#include <mutex>
 
 using namespace Eigen;
 
-class gate
+class Gate
 {
 private:
     std::string mesh_ = "package://gate_visualization/meshes/gate.dae";
@@ -25,11 +26,20 @@ private:
     ros::Time trigger_time_;
     ros::Publisher target_pub_;
     visualization_msgs::Marker maker_;
+    std::shared_ptr<int> segment_pt_;
+    std::mutex _mutex;
+    bool is_triggered_ = false;
+    std::shared_ptr<std::condition_variable> cv_;
 
 public:
-    gate(ros::Publisher &target_pub, Vector3d ini_pos, ros::Time trigger_time, int id);
-    void updateState(std::promise<Matrix3d> &&prms);
+    Gate(ros::Publisher &target_pub, Vector3d ini_pos, ros::Time trigger_time, int id, std::shared_ptr<int> &segment_pt, std::shared_ptr<Matrix3d> &target_ptr);
+
     void publishMaker();
+    void setCV(std::shared_ptr<::condition_variable> &cv);
+    void updateTarget(std::promise<Matrix3d> &&prms);
+    bool ready_ = false;
+    void updateState();
+    std::shared_ptr<Matrix3d> target_ptr_;
 };
 
 #endif

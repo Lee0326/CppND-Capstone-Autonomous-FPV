@@ -24,7 +24,7 @@ include_directories(
 )
 
 add_executable(gate_visualization 
-src/gate.cpp
+src/gate_detector.cpp
 src/gate_visulization_node.cpp)
 
 target_link_libraries(gate_visualization
