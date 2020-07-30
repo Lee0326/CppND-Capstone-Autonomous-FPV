@@ -14,10 +14,10 @@ int main(int argc, char **argv)
     std::vector<std::future<Matrix3d>> ftrs_vector;
     std::vector<std::thread> threads;
     std::shared_ptr<int> segment_pt = std::make_shared<int>(0);
-    Vector3d init_position0(3, 3, 1);
-    Vector3d init_position1(-3, 3, 1);
-    Vector3d init_position2(-3, -3, 1);
-    Vector3d init_position3(3, -3, 1);
+    Vector3d init_position0(10, 10, 1);
+    Vector3d init_position1(-10, 10, 1);
+    Vector3d init_position2(-10, -10, 1);
+    Vector3d init_position3(10, -10, 1);
     std::vector<Vector3d> position_vector;
     position_vector.push_back(init_position0);
     position_vector.push_back(init_position1);

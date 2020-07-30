@@ -14,13 +14,22 @@ void Gate::updateTarget(std::promise<Matrix3d> &&prms)
         if (!ready_)
             cv_->wait(lck);
         updateState();
+        Matrix3d m;
+        m << 1, 2, 3,
+            4, 5, 6,
+            7, 8, 4;
+        if ((id_ == *segment_pt_) && !target_locked_)
+        {
+            auto delta = Vector3d(0.5 * sin(4), 0.5 * cos(4), 0);
+            Vector3d demand_position = position_ + delta;
+            m(0, 0) = demand_position(0);
+            m(1, 0) = demand_position(1);
+            m(2, 0) = demand_position(2);
+            *target_ptr_ = m;
+            target_locked_ = true;
+        }
         if ((id_ == *segment_pt_) && (!is_triggered_))
         {
-            Matrix3d m;
-            m << 1, 2, 3,
-                4, 5, 6,
-                7, 8, 4;
-            *target_ptr_ = m;
             prms.set_value(m);
             is_triggered_ = true;
         }
@@ -61,9 +70,9 @@ void Gate::publishMaker()
     maker_.pose.orientation.w = 1.0;
 
     //set the scale
-    maker_.scale.x = 0.5;
-    maker_.scale.y = 0.5;
-    maker_.scale.z = 0.5;
+    maker_.scale.x = 1;
+    maker_.scale.y = 1;
+    maker_.scale.z = 1;
     maker_.color.a = 1.0;
     maker_.color.r = 0.0;
     maker_.color.g = 1.0;

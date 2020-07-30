@@ -29,6 +29,7 @@ private:
     std::shared_ptr<int> segment_pt_;
     std::mutex _mutex;
     bool is_triggered_ = false;
+    bool target_locked_ = false;
     std::shared_ptr<std::condition_variable> cv_;
 
 public:
@@ -40,6 +41,7 @@ public:
     bool ready_ = false;
     void updateState();
     std::shared_ptr<Matrix3d> target_ptr_;
+    void setNewLoop() { target_locked_ = false; };
 };
 
 #endif
