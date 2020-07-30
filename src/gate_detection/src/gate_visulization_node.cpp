@@ -3,6 +3,8 @@
 #include <string.h>
 #include <gate_detector.h>
 #include <trajectory_generator.h>
+#include <RapidTrajectoryGenerator.h>
+#include <SingleAxisTrajectory.h>
 
 int main(int argc, char **argv)
 {
@@ -23,8 +25,11 @@ int main(int argc, char **argv)
     position_vector.push_back(init_position1);
     position_vector.push_back(init_position2);
     position_vector.push_back(init_position3);
+    // set the initial state
+    Vec3 pos0 = Vec3(10, 0, 1); //position
 
-    Trajectory traj(n, position_vector, std::move(threads));
+    TrajectoryServer traj(n, position_vector, std::move(threads), pos0);
     traj.launchThreads();
+    traj.publishCommand();
     return 0;
 }

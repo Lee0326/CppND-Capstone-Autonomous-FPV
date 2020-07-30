@@ -26,7 +26,10 @@ include_directories(
 
 add_executable(gate_visualization 
 src/gate_detector.cpp
-src/gate_visulization_node.cpp)
+src/RapidTrajectoryGenerator.cpp
+src/SingleAxisTrajectory.cpp
+src/gate_visulization_node.cpp
+)
 
 target_link_libraries(gate_visualization
    ${catkin_LIBRARIES}
