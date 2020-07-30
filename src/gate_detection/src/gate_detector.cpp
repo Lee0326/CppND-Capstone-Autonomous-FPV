@@ -21,7 +21,6 @@ void Gate::updateTarget(std::promise<Matrix3d> &&prms)
                 4, 5, 6,
                 7, 8, 4;
             *target_ptr_ = m;
-            std::cout << id_ << std::endl;
             prms.set_value(m);
             is_triggered_ = true;
         }

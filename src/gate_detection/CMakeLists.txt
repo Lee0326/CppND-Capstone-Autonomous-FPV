@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   tf
   pose_utils
+  quadrotor_msgs
 )
 
 generate_messages()
