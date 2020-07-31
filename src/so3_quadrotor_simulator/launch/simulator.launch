@@ -6,7 +6,7 @@
          output="screen">
      <param name="rate/odom" value="100.0"/>
 
-     <param name="simulator/init_state_x" value="-2.0"/>
+     <param name="simulator/init_state_x" value="0.0"/>
      <param name="simulator/init_state_y" value=" 0.0"/>
      <param name="simulator/init_state_z" value=" 1"/>
      <remap from="~odom" to="/visual_slam/odom"/>

@@ -12,26 +12,26 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("~");
     ros::Publisher posi_cmd_pub = nh.advertise<quadrotor_msgs::PositionCommand>("/position_cmd", 10);
     //Define the trajectory starting state:
-    Vec3 pos0 = Vec3(10, 0, 1); //position
-    Vec3 vel0 = Vec3(0, 0, 0);  //velocity
-    Vec3 acc0 = Vec3(0, 0, 0);  //acceleration
+    Vec3 pos0 = Vec3(0, 0, 1); //position
+    Vec3 vel0 = Vec3(0, 0, 0); //velocity
+    Vec3 acc0 = Vec3(0, 0, 0); //acceleration
 
     //define the goal state:
-    Vec3 pos1 = Vec3(10, 10, 1.5); //position
-    Vec3 vel1 = Vec3(0, 0, 0);     //velocity
-    Vec3 acc1 = Vec3(0, 0, 0);     //acceleration
+    Vec3 pos1 = Vec3(5, 0, 1); //position
+    Vec3 vel1 = Vec3(0, 0, 0); //velocity
+    Vec3 acc1 = Vec3(0, 0, 0); //acceleration
 
-    Vec3 pos2 = Vec3(-10, 10, 1.5); //position
-    Vec3 vel2 = Vec3(0, 0, 0);      //velocity
-    Vec3 acc2 = Vec3(0, 0, 0);      //acceleration
+    Vec3 pos2 = Vec3(15, 7, 3); //position
+    Vec3 vel2 = Vec3(0, 0, 0);  //velocity
+    Vec3 acc2 = Vec3(0, 0, 0);  //acceleration
 
-    Vec3 pos3 = Vec3(-10, -10, 1.5); //position
-    Vec3 vel3 = Vec3(0, 0, 0);       //velocity
-    Vec3 acc3 = Vec3(0, 0, 0);       //acceleration
+    Vec3 pos3 = Vec3(35, -5, 2); //position
+    Vec3 vel3 = Vec3(0, 0, 0);   //velocity
+    Vec3 acc3 = Vec3(0, 0, 0);   //acceleration
 
-    Vec3 pos4 = Vec3(10, -10, 1.5); //position
-    Vec3 vel4 = Vec3(0, 0, 0);      //velocity
-    Vec3 acc4 = Vec3(0, 0, 0);      //acceleration
+    Vec3 pos4 = Vec3(30, -10, 1); //position
+    Vec3 vel4 = Vec3(0, 0, 0);    //velocity
+    Vec3 acc4 = Vec3(0, 0, 0);    //acceleration
 
     //define the duration:
     double Tf = 4;

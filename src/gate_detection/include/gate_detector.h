@@ -42,6 +42,7 @@ public:
     void updateState();
     std::shared_ptr<Matrix3d> target_ptr_;
     void setNewLoop() { target_locked_ = false; };
+    double omega_;
 };
 
 #endif

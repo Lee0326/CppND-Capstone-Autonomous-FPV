@@ -29,7 +29,7 @@ private:
     double hit_count_ = 0;
     Vec3 init_pos_;
     bool is_initial_ = true;
-    double Tf_ = 5.0;
+    double Tf_ = 3.0;
     RapidTrajectoryGenerator traj_;
     bool hit_ = false;
 
@@ -41,10 +41,11 @@ public:
         cmd_pub_ = nh.advertise<quadrotor_msgs::PositionCommand>("/position_cmd", 10);
 
         Matrix3d target;
-        target << 1, 2, 3,
-            4, 5, 6,
-            7, 8, 9;
+        target << position_vector_[0](0), 0, 0,
+            position_vector_[0](1), 0, 0,
+            position_vector_[0](2), 0, 0;
         target_ptr_ = std::make_shared<Matrix3d>(target);
+        launchThreads();
     };
     ~TrajectoryServer()
     {
@@ -71,223 +72,61 @@ public:
     void publishCommand()
     {
         quadrotor_msgs::PositionCommand pos_cmd;
-        Vec3 pos0 = init_pos_;
-        Vec3 vel0, acc0, pos1, vel1, acc1;
+        Vec3 pos0, vel0, acc0, pos1, vel1, acc1;
         Vec3 gravity = Vec3(0, 0, -9.81); //[m/s**2]
-        if (is_initial_)
-        {
-            vel0 = Vec3(0, 0, 0); //velocity
-            acc0 = Vec3(0, 0, 0); //acceleration
-            is_initial_ = false;
-        }
-
-        // traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-        // Vec3 pos1 = Matrix2pos(); //position
-        // Vec3 vel1 = Matrix2vel(); //velocity
-        // Vec3 acc1 = Matrix2ace(); //acceleration
-        // traj_.SetGoalPosition(pos1);
-        // traj_.SetGoalVelocity(vel1);
-        // traj_.SetGoalAcceleration(acc1);
-        // traj_.Generate(Tf_);
+        int last_segment = -1;
+        pos0 = init_pos_;
+        vel0 = Vec3(0, 0, 0); //velocity
+        acc0 = Vec3(0, 0, 0); //acceleration
+        is_initial_ = false;
         while (ros::ok())
         {
-            //std::cout << "last segment: " << last_segment << std::endl;
-            //std::cout << "current segment: " << *segment_pt_ << std::endl;
-            // if (hit_)
-            // {
-            //     traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-            //     pos1 = Matrix2pos(); //position
-            //     vel1 = Matrix2vel(); //velocity
-            //     acc1 = Matrix2ace(); //acceleration
-            //     traj_.SetGoalPosition(pos1);
-            //     traj_.SetGoalVelocity(vel1);
-            //     traj_.SetGoalAcceleration(acc1);
-            //     traj_.Generate(Tf_);
-            // }
-            // else
-            // {
-            //     pos0 = Matrix2pos(); //position
-            //     vel0 = Matrix2vel(); //velocity
-            //     acc0 = Matrix2ace(); //acceleration
-            // }
             double dt = (ros::Time::now() - trigger_time_).toSec();
             pos_cmd.header.stamp = ros::Time::now();
             pos_cmd.header.frame_id = "world";
-            if (dt < Tf_)
-            {
+            traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
+            pos1 = Matrix2pos(); //position
+            vel1 = Matrix2vel(); //velocity
+            acc1 = Matrix2ace(); //acceleration
+            traj_.SetGoalPosition(pos1);
+            traj_.SetGoalVelocity(vel1);
+            traj_.SetGoalAcceleration(acc1);
+            traj_.Generate(Tf_);
+            //std::cout << dt << std::endl;
+            Vec3 Position = traj_.GetPosition(dt);
+            Vec3 Velocity = traj_.GetVelocity(dt);
+            Vec3 Acceleration = traj_.GetAcceleration(dt);
+            pos_cmd.position.x = Position[0];
+            pos_cmd.position.y = Position[1];
+            pos_cmd.position.z = Position[2];
+            //std::cout << pos_cmd.position.x << std::endl;
 
-                traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-                pos1 = Matrix2pos(); //position
-                vel1 = Matrix2vel(); //velocity
-                acc1 = Matrix2ace(); //acceleration
-                traj_.SetGoalPosition(pos1);
-                traj_.SetGoalVelocity(vel1);
-                traj_.SetGoalAcceleration(acc1);
-                traj_.Generate(Tf_);
-
-                Vec3 Position = traj_.GetPosition(dt);
-                Vec3 Velocity = traj_.GetVelocity(dt);
-                Vec3 Acceleration = traj_.GetAcceleration(dt);
-                pos_cmd.position.x = Position[0];
-                pos_cmd.position.y = Position[1];
-                pos_cmd.position.z = Position[2];
-                //velocity
-                pos_cmd.velocity.x = Velocity[0];
-                pos_cmd.velocity.y = Velocity[1];
-                pos_cmd.velocity.z = Velocity[2];
-                //acceleration
-                pos_cmd.acceleration.x = Acceleration[0];
-                pos_cmd.acceleration.y = Acceleration[1];
-                pos_cmd.acceleration.z = Acceleration[2];
-                //yaw
-                pos_cmd.yaw = 0;
-                pos_cmd.yaw_dot = 0;
-                pos0 = Matrix2pos(); //position
-                vel0 = Matrix2vel(); //velocity
-                acc0 = Matrix2ace(); //acceleration
-                //cout << pos_cmd.position.x << endl;
-            }
-            else if (dt < 2 * Tf_)
-            {
-                traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-                pos1 = Matrix2pos(); //position
-                vel1 = Matrix2vel(); //velocity
-                acc1 = Matrix2ace(); //acceleration
-                traj_.SetGoalPosition(pos1);
-                traj_.SetGoalVelocity(vel1);
-                traj_.SetGoalAcceleration(acc1);
-                traj_.Generate(Tf_);
-
-                Vec3 Position = traj_.GetPosition(dt - Tf_);
-                Vec3 Velocity = traj_.GetVelocity(dt - Tf_);
-                Vec3 Acceleration = traj_.GetAcceleration(dt - Tf_);
-                pos_cmd.position.x = Position[0];
-                pos_cmd.position.y = Position[1];
-                pos_cmd.position.z = Position[2];
-                //velocity
-                pos_cmd.velocity.x = Velocity[0];
-                pos_cmd.velocity.y = Velocity[1];
-                pos_cmd.velocity.z = Velocity[2];
-                //acceleration
-                pos_cmd.acceleration.x = Acceleration[0];
-                pos_cmd.acceleration.y = Acceleration[1];
-                pos_cmd.acceleration.z = Acceleration[2];
-                //yaw
-                pos_cmd.yaw = 0;
-                pos_cmd.yaw_dot = 0;
-                //cout << pos_cmd.position.x << endl;
-                pos0 = Matrix2pos(); //position
-                vel0 = Matrix2vel(); //velocity
-                acc0 = Matrix2ace(); //acceleration
-            }
-            else if (dt < 3 * Tf_)
-            {
-                traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-                pos1 = Matrix2pos(); //position
-                vel1 = Matrix2vel(); //velocity
-                acc1 = Matrix2ace(); //acceleration
-                traj_.SetGoalPosition(pos1);
-                traj_.SetGoalVelocity(vel1);
-                traj_.SetGoalAcceleration(acc1);
-                traj_.Generate(Tf_);
-                Vec3 Position = traj_.GetPosition(dt - 2 * Tf_);
-                Vec3 Velocity = traj_.GetVelocity(dt - 2 * Tf_);
-                Vec3 Acceleration = traj_.GetAcceleration(dt - 2 * Tf_);
-                pos_cmd.position.x = Position[0];
-                pos_cmd.position.y = Position[1];
-                pos_cmd.position.z = Position[2];
-                //velocity
-                pos_cmd.velocity.x = Velocity[0];
-                pos_cmd.velocity.y = Velocity[1];
-                pos_cmd.velocity.z = Velocity[2];
-                //acceleration
-                pos_cmd.acceleration.x = Acceleration[0];
-                pos_cmd.acceleration.y = Acceleration[1];
-                pos_cmd.acceleration.z = Acceleration[2];
-                //yaw
-                pos_cmd.yaw = 0;
-                pos_cmd.yaw_dot = 0;
-
-                pos0 = Matrix2pos(); //position
-                vel0 = Matrix2vel(); //velocity
-                acc0 = Matrix2ace(); //acceleration
-            }
-            else if (dt < 4 * Tf_)
-            {
-                traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-                pos1 = Matrix2pos(); //position
-                vel1 = Matrix2vel(); //velocity
-                acc1 = Matrix2ace(); //acceleration
-                traj_.SetGoalPosition(pos1);
-                traj_.SetGoalVelocity(vel1);
-                traj_.SetGoalAcceleration(acc1);
-                traj_.Generate(Tf_);
-                Vec3 Position = traj_.GetPosition(dt - 3 * Tf_);
-                Vec3 Velocity = traj_.GetVelocity(dt - 3 * Tf_);
-                Vec3 Acceleration = traj_.GetAcceleration(dt - 3 * Tf_);
-                pos_cmd.position.x = Position[0];
-                pos_cmd.position.y = Position[1];
-                pos_cmd.position.z = Position[2];
-                //velocity
-                pos_cmd.velocity.x = Velocity[0];
-                pos_cmd.velocity.y = Velocity[1];
-                pos_cmd.velocity.z = Velocity[2];
-                //acceleration
-                pos_cmd.acceleration.x = Acceleration[0];
-                pos_cmd.acceleration.y = Acceleration[1];
-                pos_cmd.acceleration.z = Acceleration[2];
-                //yaw
-                pos_cmd.yaw = 0;
-                pos_cmd.yaw_dot = 0;
-
-                pos0 = Matrix2pos(); //position
-                vel0 = Matrix2vel(); //velocity
-                acc0 = Matrix2ace(); //acceleration
-            }
-            else if (dt < 5 * Tf_)
-            {
-                traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
-                pos1 = Matrix2pos(); //position
-                vel1 = Matrix2vel(); //velocity
-                acc1 = Matrix2ace(); //acceleration
-                traj_.SetGoalPosition(pos1);
-                traj_.SetGoalVelocity(vel1);
-                traj_.SetGoalAcceleration(acc1);
-                traj_.Generate(Tf_);
-
-                Vec3 Position = traj_.GetPosition(dt - 4 * Tf_);
-                Vec3 Velocity = traj_.GetVelocity(dt - 4 * Tf_);
-                Vec3 Acceleration = traj_.GetAcceleration(dt - 4 * Tf_);
-                pos_cmd.position.x = Position[0];
-                pos_cmd.position.y = Position[1];
-                pos_cmd.position.z = Position[2];
-                //velocity
-                pos_cmd.velocity.x = Velocity[0];
-                pos_cmd.velocity.y = Velocity[1];
-                pos_cmd.velocity.z = Velocity[2];
-                //acceleration
-                pos_cmd.acceleration.x = Acceleration[0];
-                pos_cmd.acceleration.y = Acceleration[1];
-                pos_cmd.acceleration.z = Acceleration[2];
-                //yaw
-                pos_cmd.yaw = 0;
-                pos_cmd.yaw_dot = 0;
-
-                pos0 = Matrix2pos(); //position
-                vel0 = Matrix2vel(); //velocity
-                acc0 = Matrix2ace(); //acceleration
-            }
-            else if (dt > 5 * Tf_)
-            {
-                dt = 0;
-                trigger_time_ = ros::Time::now();
-                pos0 = Matrix2pos(); //position
-                vel0 = Matrix2vel(); //velocity
-                acc0 = Matrix2ace(); //acceleration
-            }
-            pos_cmd.kx = {1, 1, 1};
-            pos_cmd.kv = {1, 1, 1};
+            //velocity
+            pos_cmd.velocity.x = Velocity[0];
+            pos_cmd.velocity.y = Velocity[1];
+            pos_cmd.velocity.z = Velocity[2];
+            //acceleration
+            pos_cmd.acceleration.x = Acceleration[0];
+            pos_cmd.acceleration.y = Acceleration[1];
+            pos_cmd.acceleration.z = Acceleration[2];
+            //yaw
+            pos_cmd.yaw = 0;
+            pos_cmd.yaw_dot = 0;
+            pos_cmd.kx = {5.0, 5.0, 5.0};
+            pos_cmd.kv = {1.0, 1.0, 1.0};
             cmd_pub_.publish(pos_cmd);
+
+            if (last_segment != *segment_pt_)
+            {
+                std::cout << "new traj! " << std::endl;
+                std::cout << "last seg! " << last_segment << std::endl;
+                std::cout << "curr seg! " << *segment_pt_ << std::endl;
+                pos0 = pos1;
+                vel0 = vel1;
+                acc0 = acc1;
+                last_segment = *segment_pt_;
+                trigger_time_ = ros::Time::now();
+            }
             ros::spinOnce();
         }
     }
@@ -302,6 +141,7 @@ public:
             threads_.push_back(std::thread(&Gate::updateTarget, gate_targets_[i], std::move(proms_vector_[i])));
         }
         cv_->notify_all();
+        publishCommand();
         Matrix3d result;
         result = ftrs_vector_[(*segment_pt_ - 1)].get();
         // std::cout << "the changed (2,2): " << target_ptr_->coeff(2, 2) << std::endl;
@@ -317,7 +157,7 @@ public:
     Vec3 Matrix2vel()
     {
         Vec3 target;
-        target[0] = 0;
+        target[0] = 5;
         target[1] = 0;
         target[2] = 0;
         return target;
@@ -333,6 +173,7 @@ public:
     void odom_callback(const nav_msgs::Odometry::ConstPtr &odom)
     {
         //publishCommand();
+        int it = 1;
         hit_ = false;
         const Vector3d position(odom->pose.pose.position.x,
                                 odom->pose.pose.position.y,
@@ -344,16 +185,16 @@ public:
         for (int i = 0; i < position_vector_.size(); i++)
         {
             double dist_gate = (position - position_vector_[i]).norm();
-            if (dist_gate < 2)
+            if (dist_gate < 1)
             {
-                *segment_pt_ = ((i + 1) % 4) + 1;
+                *segment_pt_ = ((i + 1) % position_vector_.size()) + 1;
             }
         }
         int last_loop = loop_count_;
         if (last_segment != *segment_pt_)
         {
             hit_count_ += 1;
-            loop_count_ = hit_count_ / 4;
+            loop_count_ = hit_count_ / position_vector_.size();
             hit_ = true;
         }
         if (last_loop != loop_count_)
@@ -364,8 +205,8 @@ public:
             }
         }
         // std::cout << "The drone has run " << loop_count_ << " loops" << std::endl;
-        // std::cout << target_ptr_->coeff(0, 0) << " " << target_ptr_->coeff(1, 0) << " " << target_ptr_->coeff(2, 0) << std::endl;
-        // std::cout << "the gate on target: " << *segment_pt_ << std::endl;
+        //std::cout << target_ptr_->coeff(0, 0) << " " << target_ptr_->coeff(1, 0) << " " << target_ptr_->coeff(2, 0) << std::endl;
+        //std::cout << "the gate on target: " << *segment_pt_ << std::endl;
     }
 };
 
