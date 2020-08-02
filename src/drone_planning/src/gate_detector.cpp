@@ -3,7 +3,7 @@
 #include <string.h>
 #include <gate_detector.h>
 
-Gate::Gate(ros::Publisher &target_pub, Vector3d ini_pos, ros::Time trigger_time, int id, std::shared_ptr<int> &segment_pt, std::shared_ptr<Matrix3d> &target_ptr) : target_pub_(target_pub), ini_pos_(ini_pos), trigger_time_(trigger_time), id_(id), segment_pt_(segment_pt), target_ptr_(target_ptr)
+Gate::Gate(ros::Publisher &target_pub, Vector3d ini_pos, ros::Time trigger_time, int id, std::shared_ptr<int> &segment_pt, std::shared_ptr<Matrix3d> &target_ptr, double Tf) : target_pub_(target_pub), ini_pos_(ini_pos), trigger_time_(trigger_time), id_(id), segment_pt_(segment_pt), target_ptr_(target_ptr), Tf_(Tf)
 {
     omega_ = (double)id_ / 4;
 };
@@ -23,9 +23,7 @@ void Gate::updateTarget(std::promise<Matrix3d> &&prms)
             7, 8, 4;
         if ((id_ == *segment_pt_) && !target_locked_)
         {
-
-            std::cout << omega_ << std::endl;
-            auto delta = Vector3d(0, 0.5 * cos((1 + omega_) * 3), 0);
+            auto delta = Vector3d(0, 0.4 * cos((1 + omega_) * Tf_), 0);
             Vector3d demand_position = position_ + delta;
             m(0, 0) = demand_position(0);
             m(1, 0) = demand_position(1);
@@ -44,9 +42,8 @@ void Gate::updateTarget(std::promise<Matrix3d> &&prms)
 
 void Gate::updateState()
 {
-
     double duration = (ros::Time::now() - trigger_time_).toSec();
-    auto deltaPos = Vector3d(0, 0.5 * cos((1 + omega_) * duration), 0);
+    auto deltaPos = Vector3d(0, 0.4 * cos((1 + omega_) * duration), 0);
     position_ = ini_pos_ + deltaPos;
     if (id_ != 1)
         Gate::publishMaker();
