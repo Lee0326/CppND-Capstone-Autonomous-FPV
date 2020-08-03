@@ -46,7 +46,7 @@ void Gate::updateState()
         Gate::publishMaker();
     ros::spinOnce();
 };
-void Gate::setCV(std::shared_ptr<::condition_variable> &cv)
+void Gate::setCV(std::shared_ptr<std::condition_variable> cv)
 {
     cv_ = cv;
 };
@@ -70,10 +70,10 @@ void Gate::publishMaker()
     maker_.pose.orientation.w = 1.0;
 
     //set the scale
-    maker_.scale.x = 1.5;
-    maker_.scale.y = 1.5;
-    maker_.scale.z = 1.5;
-    maker_.color.a = 1.5;
+    maker_.scale.x = 1.7;
+    maker_.scale.y = 1.7;
+    maker_.scale.z = 1.7;
+    maker_.color.a = 1.0;
     maker_.color.r = 0.0;
     maker_.color.g = 1.0;
     maker_.color.b = 0.0;

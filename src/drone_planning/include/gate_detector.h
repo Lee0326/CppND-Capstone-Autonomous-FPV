@@ -36,9 +36,8 @@ private:
 
 public:
     Gate(ros::Publisher &target_pub, Vector3d ini_pos, std::shared_ptr<ros::Time> trigger_time, int id, std::shared_ptr<int> &segment_pt, std::shared_ptr<Matrix3d> &target_ptr, double Tf);
-
     void publishMaker();
-    void setCV(std::shared_ptr<::condition_variable> &cv);
+    void setCV(std::shared_ptr<std::condition_variable> cv);
     void updateTarget(std::promise<int> &&prms);
     void setReady() { ready_ = true; }
     void updateState();

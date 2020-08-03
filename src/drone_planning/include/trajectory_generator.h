@@ -19,7 +19,6 @@ private:
     std::vector<std::thread> threads_;
     std::shared_ptr<std::condition_variable> cv_;
     std::shared_ptr<Matrix3d> target_ptr_;
-    std::shared_ptr<Matrix3d> init_ptr_;
     std::shared_ptr<int> segment_pt_;
     ros::NodeHandle nh_;
     ros::Publisher cmd_pub_;

@@ -1,8 +1,9 @@
 #include <trajectory_generator.h>
 TrajectoryServer::TrajectoryServer(ros::NodeHandle &nh, std::vector<Vector3d> &position_vector, std::vector<std::thread> &&threads, Vec3 init_pos) : nh_(nh), position_vector_(position_vector), threads_(std::move(threads)), init_pos_(init_pos)
 {
-    cv_ = std::make_shared<std::condition_variable>();
+    //cv_ = std::make_shared<std::condition_variable>();
     segment_pt_ = std::make_shared<int>(1);
+    cv_ = std::make_shared<std::condition_variable>();
     cmd_pub_ = nh.advertise<quadrotor_msgs::PositionCommand>("/position_cmd", 10);
 
     Matrix3d target;
@@ -88,7 +89,7 @@ void TrajectoryServer::publishCommand()
         //yaw
         pos_cmd.yaw = 0;
         pos_cmd.yaw_dot = 0;
-        pos_cmd.kx = {1.0, 1.0, 1.0};
+        pos_cmd.kx = {3.0, 4.0, 3.0};
         pos_cmd.kv = {1.0, 1.0, 1.0};
         cmd_pub_.publish(pos_cmd);
 
