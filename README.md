@@ -55,3 +55,5 @@ rosrun drone_planning drone_planning
 ```
 
 ![indoor](files/rviz.gif)
+
+The markers of the gates are also published when the node is running. It needs to be added for visualization by the left-down button in rviz. The topics are `/gate_maker${N}` where `N` is the gate number.
