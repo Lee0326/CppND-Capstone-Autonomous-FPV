@@ -104,7 +104,7 @@ void TrajectoryServer::publishCommand()
             {
                 int result;
                 result = ftrs_vector_[(*segment_pt_ - 2)].get();
-                std::cout << "Fly through Gate No." << result << " !" << std::endl;
+                std::cout << "Flying towards Gate No." << result << " !" << std::endl;
             }
         }
         ros::spinOnce();

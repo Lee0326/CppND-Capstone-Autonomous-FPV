@@ -29,7 +29,7 @@ private:
     double hit_count_ = 0;
     Vec3 init_pos_;
     bool is_initial_ = true;
-    double Tf_ = 5;
+    double Tf_ = 4.0;
     RapidTrajectoryGenerator traj_;
     bool hit_ = false;
     double dt;
