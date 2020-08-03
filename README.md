@@ -1,6 +1,8 @@
-# CPPND: Capstone Hello World Repo
+# CPPND: Capstone-Autonomous FPV Simulation
 
-This is the repo for the Capstone project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213).
+## Drone Racing
+
+This is the repo for the Capstone project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213).  Drone racing is a popular sport in which professional pilots fly small quadrotors through complex tracks at high speeds.  In this repo,  an autonomous fpv drone is simulated flying through multiple gates in rviz. The drone dynamically plans the real-time trajectory according the the position prediction of the targeted gate.  The controller subscribes the trajectory topic and transmit the desired control signal to the dynamic model of the drone. 
 
 ## Dependencies for Running Locally
 * Install ROS (melodic in ubuntu 18.04)

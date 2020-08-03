@@ -88,7 +88,7 @@ void TrajectoryServer::publishCommand()
         //yaw
         pos_cmd.yaw = 0;
         pos_cmd.yaw_dot = 0;
-        pos_cmd.kx = {5.0, 5.0, 5.0};
+        pos_cmd.kx = {1.0, 1.0, 1.0};
         pos_cmd.kv = {1.0, 1.0, 1.0};
         cmd_pub_.publish(pos_cmd);
 
@@ -128,7 +128,7 @@ void TrajectoryServer::launchThreads()
 Vec3 TrajectoryServer::Matrix2pos()
 {
     Vec3 target;
-    target[0] = target_ptr_->coeff(0, 0);
+    target[0] = target_ptr_->coeff(0, 0) + 0.5;
     target[1] = target_ptr_->coeff(1, 0);
     target[2] = target_ptr_->coeff(2, 0);
     return target;
@@ -137,7 +137,7 @@ Vec3 TrajectoryServer::Matrix2pos()
 Vec3 TrajectoryServer::Matrix2vel()
 {
     Vec3 target;
-    target[0] = 5;
+    target[0] = 3;
     target[1] = 0;
     target[2] = 0;
     return target;
@@ -167,7 +167,7 @@ void TrajectoryServer::odom_callback(const nav_msgs::Odometry::ConstPtr &odom)
 
     double x_cordi = position_vector_[(*segment_pt_ - 1)](0);
     double dist_gate = abs(position(0) - x_cordi);
-    if (dist_gate < 0.07)
+    if (dist_gate < 0.05)
     {
         *segment_pt_ = (*segment_pt_ % position_vector_.size()) + 1;
     }
