@@ -18,10 +18,10 @@ int main(int argc, char **argv)
     std::shared_ptr<int> segment_pt = std::make_shared<int>(0);
 
     Vector3d init_position1(0, 0, 0.5);
-    Vector3d init_position2(10, -5, 4);
-    Vector3d init_position3(20, 0, 8);
-    Vector3d init_position4(31, 6, 5);
-    Vector3d init_position5(40, 0, 1);
+    Vector3d init_position2(15, -5, 4);
+    Vector3d init_position3(30, 0, 8);
+    Vector3d init_position4(45, 6, 5);
+    Vector3d init_position5(60, 0, 1);
     std::vector<Vector3d> position_vector;
     position_vector.push_back(init_position1);
     position_vector.push_back(init_position2);
