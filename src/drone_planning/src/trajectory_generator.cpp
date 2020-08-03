@@ -24,15 +24,16 @@ TrajectoryServer::~TrajectoryServer()
 void TrajectoryServer::setGates()
 {
     trigger_time_ = ros::Time::now();
+    auto trigger_time_ptr = std::make_shared<ros::Time>(trigger_time_);
     for (int i = 0; i < position_vector_.size(); i++)
     {
         ros::Publisher targetPub = nh_.advertise<visualization_msgs::Marker>("gate_marker" + std::to_string(i), 10);
         publisers_.push_back(targetPub);
-        std::promise<Matrix3d> prms;
-        std::future<Matrix3d> ftr = prms.get_future();
+        std::promise<int> prms;
+        std::future<int> ftr = prms.get_future();
         proms_vector_.push_back(std::move(prms));
         ftrs_vector_.push_back(std::move(ftr));
-        gate_targets_.push_back(std::make_shared<Gate>(targetPub, position_vector_[i], trigger_time_, (i + 1), segment_pt_, target_ptr_, Tf_));
+        gate_targets_.push_back(std::make_shared<Gate>(targetPub, position_vector_[i], trigger_time_ptr, (i + 1), segment_pt_, target_ptr_, Tf_));
     }
 };
 
@@ -48,7 +49,7 @@ void TrajectoryServer::publishCommand()
     is_initial_ = false;
     while (ros::ok())
     {
-        double dt = (ros::Time::now() - trigger_time_).toSec();
+        dt = (ros::Time::now() - trigger_time_).toSec();
         pos_cmd.header.stamp = ros::Time::now();
         pos_cmd.header.frame_id = "world";
         traj_ = RapidTrajectoryGenerator(pos0, vel0, acc0, gravity);
@@ -92,12 +93,19 @@ void TrajectoryServer::publishCommand()
         cmd_pub_.publish(pos_cmd);
 
         if (last_segment != *segment_pt_)
+        //if (dt > (Tf_ - 0.05) && *segment_pt_ != 1)
         {
             pos0 = pos1;
             vel0 = vel1;
             acc0 = acc1;
             last_segment = *segment_pt_;
             trigger_time_ = ros::Time::now();
+            if (loop_count_ == 0 && *segment_pt_ != 1)
+            {
+                int result;
+                result = ftrs_vector_[(*segment_pt_ - 2)].get();
+                std::cout << "Fly through Gate No." << result << " !" << std::endl;
+            }
         }
         ros::spinOnce();
     }
@@ -115,14 +123,12 @@ void TrajectoryServer::launchThreads()
     }
     cv_->notify_all();
     publishCommand();
-    Matrix3d result;
-    result = ftrs_vector_[(*segment_pt_ - 1)].get();
 };
 
 Vec3 TrajectoryServer::Matrix2pos()
 {
     Vec3 target;
-    target[0] = target_ptr_->coeff(0, 0) + 0.5;
+    target[0] = target_ptr_->coeff(0, 0);
     target[1] = target_ptr_->coeff(1, 0);
     target[2] = target_ptr_->coeff(2, 0);
     return target;
@@ -158,13 +164,12 @@ void TrajectoryServer::odom_callback(const nav_msgs::Odometry::ConstPtr &odom)
                             odom->twist.twist.linear.y,
                             odom->twist.twist.linear.z);
     int last_segment = *segment_pt_;
-    for (int i = 0; i < position_vector_.size(); i++)
+
+    double x_cordi = position_vector_[(*segment_pt_ - 1)](0);
+    double dist_gate = abs(position(0) - x_cordi);
+    if (dist_gate < 0.07)
     {
-        double dist_gate = (position - position_vector_[i]).norm();
-        if (dist_gate < 1.1)
-        {
-            *segment_pt_ = ((i + 1) % position_vector_.size()) + 1;
-        }
+        *segment_pt_ = (*segment_pt_ % position_vector_.size()) + 1;
     }
     int last_loop = loop_count_;
     if (last_segment != *segment_pt_)

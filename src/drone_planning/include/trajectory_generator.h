@@ -12,8 +12,8 @@ class TrajectoryServer
 {
 private:
     std::vector<std::shared_ptr<Gate>> gate_targets_;
-    std::vector<std::promise<Matrix3d>> proms_vector_;
-    std::vector<std::future<Matrix3d>> ftrs_vector_;
+    std::vector<std::promise<int>> proms_vector_;
+    std::vector<std::future<int>> ftrs_vector_;
     std::vector<Vector3d> position_vector_;
     std::vector<ros::Publisher> publisers_;
     std::vector<std::thread> threads_;
@@ -29,9 +29,10 @@ private:
     double hit_count_ = 0;
     Vec3 init_pos_;
     bool is_initial_ = true;
-    double Tf_ = 3;
+    double Tf_ = 2;
     RapidTrajectoryGenerator traj_;
     bool hit_ = false;
+    double dt;
 
 public:
     TrajectoryServer(ros::NodeHandle &nh, std::vector<Vector3d> &position_vector, std::vector<std::thread> &&threads, Vec3 init_pos);

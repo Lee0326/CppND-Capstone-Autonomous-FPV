@@ -23,7 +23,7 @@ private:
     Quaterniond orientation_ = Quaterniond(1, 0, 0, 0);
     Vector3d ini_pos_;
     int id_;
-    ros::Time trigger_time_;
+    std::shared_ptr<ros::Time> trigger_time_;
     ros::Publisher target_pub_;
     visualization_msgs::Marker maker_;
     std::shared_ptr<int> segment_pt_;
@@ -35,11 +35,11 @@ private:
     double Tf_;
 
 public:
-    Gate(ros::Publisher &target_pub, Vector3d ini_pos, ros::Time trigger_time, int id, std::shared_ptr<int> &segment_pt, std::shared_ptr<Matrix3d> &target_ptr, double Tf);
+    Gate(ros::Publisher &target_pub, Vector3d ini_pos, std::shared_ptr<ros::Time> trigger_time, int id, std::shared_ptr<int> &segment_pt, std::shared_ptr<Matrix3d> &target_ptr, double Tf);
 
     void publishMaker();
     void setCV(std::shared_ptr<::condition_variable> &cv);
-    void updateTarget(std::promise<Matrix3d> &&prms);
+    void updateTarget(std::promise<int> &&prms);
     void setReady() { ready_ = true; }
     void updateState();
     std::shared_ptr<Matrix3d> target_ptr_;
